@@ -7,17 +7,17 @@ echo "Be sure to update the password in the .password file (this will be the Pos
 echo " "
 read -n 1 -s -r -p "Press any key to continue... or ctrl+c to exit..."
 echo "Cloning Repo"
-git clone https://github.com/Talderon/k8s-sonarqube.git
+(ssh-agent bash -c 'ssh-add ~/.ssh/github; git clone git@github.com:Talderon/k8s-sonarqube.git')
 cd k8s-sonarqube
 echo "Creating Database Password"
 kubectl create secret generic postgres-pwd --from-file=./password
 echo "Creating SonarQube with Postgres"
-kubectl create -f /root/k8s-sonarqube/sonar-pv-postgres.yaml
-kubectl create -f /root/k8s-sonarqube/sonar-pvc-postgres.yaml
-kubectl create -f /root/k8s-sonarqube/sonar-postgres-deployment.yaml
-kubectl create -f /root/k8s-sonarqube/sonarqube-deployment.yaml
-kubectl create -f /root/k8s-sonarqube/sonarqube-service.yaml
-kubectl create -f /root/k8s-sonarqube/sonar-postgres-service.yaml
+kubectl create -f sonar-pv-postgres.yaml
+kubectl create -f sonar-pvc-postgres.yaml
+kubectl create -f sonar-postgres-deployment.yaml
+kubectl create -f sonarqube-deployment.yaml
+kubectl create -f sonarqube-service.yaml
+kubectl create -f sonar-postgres-service.yaml
 cd ..
 echo "Downloading and Installing Sonar Go Plugin on the Server"
 wget https://github.com/uartois/sonar-golang/releases/download/v1.2.11/sonar-golang-plugin-1.2.11.jar
