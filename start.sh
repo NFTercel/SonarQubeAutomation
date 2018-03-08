@@ -10,6 +10,7 @@ echo "4. SSH to your new instance and add the hostname to your /etc/hosts file (
 echo "5. (new instance) Add the SSH Key you created for VIO to this node (be sure to chmod 600 ~/.ssh/your_key)."
 echo "6. (new instance) Add your GitLab SSH Key to this node with the filename id_rsa (be sure to chmod 600 ~/.ssh/id_rsa)."
 echo " "
+echo "These scripts, at times, will need user input. You'll want to watch for these pauses."
 while true; do
     read -p "Continue with the deplopyment? (y)es or (n)o >> " yn
     case $yn in

@@ -12,25 +12,34 @@ cd k8s-sonarqube
 echo "Creating Database Password"
 kubectl create secret generic postgres-pwd --from-file=./password
 echo "Creating SonarQube with Postgres"
-kubectl create -f sonar-pv-postgres.yaml
-kubectl create -f sonar-pvc-postgres.yaml
-kubectl create -f sonar-postgres-deployment.yaml
-kubectl create -f sonarqube-deployment.yaml
-kubectl create -f sonarqube-service.yaml
-kubectl create -f sonar-postgres-service.yaml
-echo "Installing Sonar Go Plugin on the Server"
-wget https://github.com/uartois/sonar-golang/releases/download/v1.2.10/sonar-golang-plugin-1.2.10.jar
+kubectl create -f /root/k8s-sonarqube/sonar-pv-postgres.yaml
+kubectl create -f /root/k8s-sonarqube/sonar-pvc-postgres.yaml
+kubectl create -f /root/k8s-sonarqube/sonar-postgres-deployment.yaml
+kubectl create -f /root/k8s-sonarqube/sonarqube-deployment.yaml
+kubectl create -f /root/k8s-sonarqube/sonarqube-service.yaml
+kubectl create -f /root/k8s-sonarqube/sonar-postgres-service.yaml
+cd ..
+echo "Downloading and Installing Sonar Go Plugin on the Server"
+wget https://github.com/uartois/sonar-golang/releases/download/v1.2.11/sonar-golang-plugin-1.2.11.jar
 psonar=( $(kubectl get pods -o wide --all-namespaces | grep sonarqube- ) )
-kubectl cp sonar-golang-plugin-1.2.10.jar ${psonar[0]}/${psonar[1]}:/opt/sonarqube/extensions/plugins
+kubectl cp sonar-golang-plugin-1.2.11.jar ${psonar[1]}:/opt/sonarqube/extensions/plugins/
 echo "Assembling Server URL"
-echo "You will see a port in the format of: 80:xxxxx, you want to record the port after 80:"
-kubectl get svc sonar
-echo "Here, you will see the IP Addresses for the Pods (external), normally this installs onto Pod0, but save both in case"
+echo "Here, you will see the IP Addresses for the Pod (external) Sonarqube is deployed too."
+echo "Note the URLS's for both nodes"
 kubectl get pods -o wide --all-namespaces | grep nginx-proxy-local-node-
+read -n 1 -s -r -p "Press any key to continue..."
+echo "You will see a port in the format of: 80:xxxxx, you want to record the port after 80:"
+kubectl describe pods sonarqube | grep Node:
+read -n 1 -s -r -p "Press any key to continue..."
 echo "Use the PodIP and NodePort from above to assemble your URL"
 echo "http://{PODIP}:{NodePort}/sonar"
+echo "Default login is admin/admin"
 echo "Once in, you will need to install the following plugins (Administration >> Marketplace)"
 echo "Checkstyle and SonarJava"
-echo "Once installed and verified, restart the server (Administration >> System >> Restart Server button"
+echo "Verify that the GoLang plugin is installed"
+echo "Once installed and verified, restart the server (Administration >> System >> Restart Server button)"
+echo " "
+echo "##### Completed SonarQube Server Sertup #####"
 read -n 1 -s -r -p "Press any key to continue with the Local Environment Setup... or ctrl+c to exit..."
+cd /root/SonarQubeAutomation
 ./local-env-setup.sh
