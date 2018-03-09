@@ -8,8 +8,13 @@ echo "Clone Kraken Repo"
 git clone git@gitswarm.f5net.com:blue-ca/kraken.git
 echo "Installing Docker"
 apt install -y docker.io
+systemctl start docker
+systemctl enable docker
 echo "Installing Kubectl"
-snap install kubectl --classic
+# snap install kubectl --classic
+curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+chmod +x ./kubectl
+mv ./kubectl /usr/local/bin/kubectl
 echo "Installing JQ"
 apt install -y jq
 echo "Downloading and installing Certificates"
@@ -26,27 +31,18 @@ echo "2. vio-password (Your vio password)"
 echo "3. vio-project-id (Vio Dashboard: Identity >> Projects ** In the table that is displayed, the NAME column is the Tenant Name and the Project ID is just that."
 echo "4. vio-tennant-name (See above)"
 read -n 1 -s -r -p "Press any key to continue..."
-if read -p "What is your username? : " name; then
-  sed -i~ -e "s/<<vio-username>>/${name}/g" target_workspace/terraform_desktop.tfvars
-  sed -i~ -e "s/<<username>>/${name}/g" target_workspace/terraform_desktop.tfvars
-else
-  # Error
-fi
-if read -p -s "What is your password? : " pass; then
-  sed -i~ -e "s/<<vio-password>>/${pass}/g" target_workspace/terraform_desktop.tfvars
-else
-  # Error
-fi
-if read -p "What is your project-id? : " pjid; then
-  sed -i~ -e "s/<<vio-project-id>>/${pjid}/g" target_workspace/terraform_desktop.tfvars
-else
-  # Error
-fi
-if read -p "What is your tenant-name? : " tenant; then
-  sed -i~ -e "s/<<vio-tenant-name>>/${tenant}/g" target_workspace/terraform_desktop.tfvars
-else
-  # Error
-fi
+read -p "What is your username? : " name
+read -p -s "What is your password? : " pass
+read -p "What is your project-id? : " pjid
+read -p "What is your tenant-name? : " tenant
+sed -i~ -e "s/<<vio-username>>/${name}/g" target_workspace/terraform_desktop.tfvars
+sed -i~ -e "s/<<username>>/${name}/g" target_workspace/terraform_desktop.tfvars
+sed -i~ -e "s/<<vio-password>>/${pass}/g" target_workspace/terraform_desktop.tfvars
+sed -i~ -e "s/<<vio-project-id>>/${pjid}/g" target_workspace/terraform_desktop.tfvars
+sed -i~ -e "s/<<vio-tenant-name>>/${tenant}/g" target_workspace/terraform_desktop.tfvars
+sed -i~ -e "s/AdminNetwork/AdminNetwork2/g" target_workspace/terraform_desktop.tfvars
+sed -i~ -e "s/<<vio-tenant-name>>/${tenant}/g" target_workspace/terraform_desktop.tfvars
+sed -i~ -e "s/<<vio-tenant-name>>/${tenant}/g" target_workspace/terraform_desktop.tfvars
 echo "Exporting Vault Token"
 export VAULT_TOKEN=bb569f0a-a26a-e72b-4fcb-357e53da6cb0
 echo "Building Kraken"
@@ -54,8 +50,11 @@ apt install -y make
 make build
 echo "Creating Terraform Plan"
 docker run --rm kraken --plan --development --username=${name} --local-tf-vars=../target_workspace/terraform_desktop.tfvars
-echo "Running Plan"
+echo "Running Terraform Plan - This can take 10+ minutes to run!"
+read -n 1 -s -r -p "Press any key to continue..."
 docker run --rm kraken --apply --development --username=${name} --local-tf-vars=../target_workspace/terraform_desktop.tfvars
+mkdir /root/.kube
+curl http://10.145.80.228:8500/v1/kv/Users/${name}/kubernetes/local/managed/config_admin |jq -r '.[]|.Value'|base64 --decode > ~/.kube/config
 echo "################### Kraken Deployment Completed ###################"
 cd /root/SonarQubeAutomation
 read -n 1 -s -r -p "Press any key to continue with the Sonar Server Setup... or ctrl+c to exit..."

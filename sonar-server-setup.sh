@@ -10,7 +10,7 @@ echo "Cloning Repo"
 (ssh-agent bash -c 'ssh-add ~/.ssh/github; git clone git@github.com:Talderon/k8s-sonarqube.git')
 cd k8s-sonarqube
 echo "Creating Database Password"
-kubectl create secret generic postgres-pwd --from-file=./password
+kubectl create secret generic postgres-pwd --from-file=.password
 echo "Creating SonarQube with Postgres"
 kubectl create -f sonar-pv-postgres.yaml
 kubectl create -f sonar-pvc-postgres.yaml

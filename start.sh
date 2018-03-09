@@ -1,6 +1,7 @@
 #!/bin/bash
 # This script is to automate the installation of Kraken
 
+clear
 echo "In order to complete this deployment process, you must have the following configured:"
 echo " "
 echo "1. A small instance in VIO (These instructions assume Ubuntu 16.0.4 LTS Pristine image)."
