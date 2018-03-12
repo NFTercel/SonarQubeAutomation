@@ -1,5 +1,7 @@
 #!/bin/bash
-# This script is to automate the installation of Kraken
+# This script is to automate the installation of Kraken (this is only useful for F5 Networks)
+# This script is not intended for public release!!
+# This script will be replaced with MiniKube (local), AWS and Azure variants.
 # Dennis Christilaw (2018)
 
 echo "This script requires user input, please keep an eye out for the prompts."
