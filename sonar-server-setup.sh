@@ -1,5 +1,6 @@
 #!/bin/bash
 # This script is to automate the installation of SonarQube Server
+# Dennis Christilaw (2018)
 
 echo "This script will install SonarQube Server with Postgres Database inside the Kubernets environment you set up with Kraken"
 echo "This script requires user input, please keep an eye out for the prompts."
@@ -10,7 +11,8 @@ echo "Cloning Repo"
 (ssh-agent bash -c 'ssh-add ~/.ssh/github; git clone git@github.com:Talderon/k8s-sonarqube.git')
 cd k8s-sonarqube
 echo "Creating Database Password"
-kubectl create secret generic postgres-pwd --from-file=.password
+read -p -s "Enter your Database Password (root) : " dbpass
+kubectl create secret generic postgres-pwd --from-literal=password=${dbpass}
 echo "Creating SonarQube with Postgres"
 kubectl create -f sonar-pv-postgres.yaml
 kubectl create -f sonar-pvc-postgres.yaml
@@ -26,11 +28,13 @@ kubectl cp sonar-golang-plugin-1.2.11.jar ${psonar[1]}:/opt/sonarqube/extensions
 echo "Assembling Server URL"
 echo "Here, you will see the IP Addresses for the Pod (external) Sonarqube is deployed too."
 echo "Note the URLS's for both nodes"
-kubectl get pods -o wide --all-namespaces | grep nginx-proxy-local-node-
-read -n 1 -s -r -p "Press any key to continue..."
-echo "You will see a port in the format of: 80:xxxxx, you want to record the port after 80:"
 kubectl describe pods sonarqube | grep Node:
 read -n 1 -s -r -p "Press any key to continue..."
+echo "You will see a port in the format of: 80:xxxxx, you want to record the port after 80:"
+kubectl get all | grep NodePort
+read -n 1 -s -r -p "Press any key to continue..."
+clear
+echo "Save this URL as you will need it later for your local environment setup!"
 echo "Use the PodIP and NodePort from above to assemble your URL"
 echo "http://{PODIP}:{NodePort}/sonar"
 echo "Default login is admin/admin"

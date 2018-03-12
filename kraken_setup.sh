@@ -1,5 +1,7 @@
 #!/bin/bash
 # This script is to automate the installation of Kraken
+# Dennis Christilaw (2018)
+
 echo "This script requires user input, please keep an eye out for the prompts."
 read -n 1 -s -r -p "Press any key to continue..."
 echo "Performing Update"
@@ -7,11 +9,12 @@ apt-get -y update
 echo "Clone Kraken Repo"
 git clone git@gitswarm.f5net.com:blue-ca/kraken.git
 echo "Installing Docker"
-apt install -y docker.io
-systemctl start docker
-systemctl enable docker
+sudo apt-get -y install apt-transport-https ca-certificates curl software-properties-common make
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+apt-get -y update
+apt-get install docker-ce
 echo "Installing Kubectl"
-# snap install kubectl --classic
 curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
 chmod +x ./kubectl
 mv ./kubectl /usr/local/bin/kubectl
@@ -21,6 +24,7 @@ echo "Downloading and installing Certificates"
 wget https://weblogin.f5net.com/sso/SE3CIPICA01.F5Net.com_F5_F5NET_Issuing_CA.crt && wget https://weblogin.f5net.com/sso/SE3CIPOCA01_F5_Root_CA.crt
 cp SE3CI*.crt /usr/local/share/ca-certificates/
 update-ca-certificates
+rm -f SE3CI*.crt
 echo "Changing to kraken directory"
 cd kraken
 echo "The following questions are needed to configure your account info for the build."
@@ -40,13 +44,9 @@ sed -i~ -e "s/<<username>>/${name}/g" target_workspace/terraform_desktop.tfvars
 sed -i~ -e "s/<<vio-password>>/${pass}/g" target_workspace/terraform_desktop.tfvars
 sed -i~ -e "s/<<vio-project-id>>/${pjid}/g" target_workspace/terraform_desktop.tfvars
 sed -i~ -e "s/<<vio-tenant-name>>/${tenant}/g" target_workspace/terraform_desktop.tfvars
-sed -i~ -e "s/AdminNetwork/AdminNetwork2/g" target_workspace/terraform_desktop.tfvars
-sed -i~ -e "s/<<vio-tenant-name>>/${tenant}/g" target_workspace/terraform_desktop.tfvars
-sed -i~ -e "s/<<vio-tenant-name>>/${tenant}/g" target_workspace/terraform_desktop.tfvars
 echo "Exporting Vault Token"
 export VAULT_TOKEN=bb569f0a-a26a-e72b-4fcb-357e53da6cb0
 echo "Building Kraken"
-apt install -y make
 make build
 echo "Creating Terraform Plan"
 docker run --rm kraken --plan --development --username=${name} --local-tf-vars=../target_workspace/terraform_desktop.tfvars

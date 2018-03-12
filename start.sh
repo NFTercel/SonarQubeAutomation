@@ -1,5 +1,6 @@
 #!/bin/bash
 # This script is to automate the installation of Kraken
+# Dennis Christilaw (2018)
 
 clear
 echo "In order to complete this deployment process, you must have the following configured:"
