@@ -1,6 +1,7 @@
 #!/bin/bash
 # This script is to automate the installation of Kraken
 # Dennis Christilaw (2018)
+# This code is licensed under the GNU General Public License v3.0
 
 clear
 echo "In order to complete this deployment process, you must have the following configured:"

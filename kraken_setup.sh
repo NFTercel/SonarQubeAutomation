@@ -3,6 +3,7 @@
 # This script is not intended for public release!!
 # This script will be replaced with MiniKube (local), AWS and Azure variants.
 # Dennis Christilaw (2018)
+# This code is licensed under the GNU General Public License v3.0
 
 echo "This script requires user input, please keep an eye out for the prompts."
 read -n 1 -s -r -p "Press any key to continue..."

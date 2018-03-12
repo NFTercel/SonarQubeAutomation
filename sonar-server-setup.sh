@@ -1,6 +1,7 @@
 #!/bin/bash
 # This script is to automate the installation of SonarQube Server
 # Dennis Christilaw (2018)
+# This code is licensed under the GNU General Public License v3.0
 
 echo "This script will install SonarQube Server with Postgres Database inside the Kubernets environment you set up with Kraken"
 echo "This script requires user input, please keep an eye out for the prompts."
