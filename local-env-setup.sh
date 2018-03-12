@@ -29,7 +29,7 @@ wget https://sonarsource.bintray.com/Distribution/sonar-scanner-cli/sonar-scanne
 unzip sonar-scanner-cli-3.0.3.778-linux.zip -d /usr/local/
 mv /usr/local/sonar-scanner-3.0.3.778-linux /usr/local/sonar-scanner
 sed -i '100s#go_projects/bin#go_projects/bin:/usr/local/sonar-scanner/bin#' .bashrc && source .bashrc
-read -p "What is the SonarQube URL? (Full url with http://ip_addy:port/sonar) >> " surl
+read -p "What is the SonarQube URL? (Full url with http://ip_add:port/sonar) >> " surl
 rm /usr/local/sonar-scanner/conf/sonar-scanner.properties
 printf '%s\n' '#----- Default SonarQube server' 'sonar.host.url='${surl} ' ' '#----- Default source code encoding' '#sonar.sourceEncoding=UTF-8' >/usr/local/sonar-scanner/conf/sonar-scanner.properties
 clear

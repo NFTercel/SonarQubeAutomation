@@ -1,15 +1,21 @@
 #!/bin/bash
 # This script is to automate the installation of SonarQube Server
+# Kubernetest Cluster is required before continuing
 # Dennis Christilaw (2018)
 # This code is licensed under the GNU General Public License v3.0
 
-echo "This script will install SonarQube Server with Postgres Database inside the Kubernets environment you set up with Kraken"
+echo "This script will install SonarQube Server with Postgres Database inside the Kubernets environment you set up."
 echo "This script requires user input, please keep an eye out for the prompts."
-echo "Be sure to update the password in the .password file (this will be the Postgres Root Password)"
+echo "If you plan to use SSH Git Commands, you will need to do the following:"
+echo "Fork the following repo: https://github.com/Talderon/k8s-sonarqube"
+echo "Be sure to have your github ssh key in the ~/.ssh directory."
+echo "Other option will be to clone via HTTPS which this script is not set up for."
 echo " "
 read -n 1 -s -r -p "Press any key to continue... or ctrl+c to exit..."
 echo "Cloning Repo"
-(ssh-agent bash -c 'ssh-add ~/.ssh/github; git clone git@github.com:Talderon/k8s-sonarqube.git')
+read -p "What is the name of your github private ssh key (must be in the ~/.ssh directory)? : " gitkey
+read -p "What is the name of your github user name? : " guser
+(ssh-agent bash -c 'ssh-add ~/.ssh/${gitkey}; git clone git@github.com:${guser}/k8s-sonarqube.git')
 cd k8s-sonarqube
 echo "Creating Database Password"
 read -p -s "Enter your Database Password (root) : " dbpass
@@ -28,11 +34,12 @@ psonar=( $(kubectl get pods -o wide --all-namespaces | grep sonarqube- ) )
 kubectl cp sonar-golang-plugin-1.2.11.jar ${psonar[1]}:/opt/sonarqube/extensions/plugins/
 echo "Assembling Server URL"
 echo "Here, you will see the IP Addresses for the Pod (external) Sonarqube is deployed too."
-echo "Note the URLS's for both nodes"
+echo "Note the URLS's for all pods if you are not sure which pod is being deployed too."
 kubectl describe pods sonarqube | grep Node:
 read -n 1 -s -r -p "Press any key to continue..."
 echo "You will see a port in the format of: 80:xxxxx, you want to record the port after 80:"
 kubectl get all | grep NodePort
+echo "Save this URL outside this terminal window."
 read -n 1 -s -r -p "Press any key to continue..."
 clear
 echo "Save this URL as you will need it later for your local environment setup!"
