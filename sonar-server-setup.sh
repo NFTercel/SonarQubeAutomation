@@ -18,9 +18,10 @@ read -p "What is the name of your github private ssh key (must be in the ~/.ssh 
 read -p "What is the name of your github user name? : " guser
 (ssh-agent bash -c 'ssh-add ~/.ssh/${gitkey}; git clone git@github.com:${guser}/k8s-sonarqube.git')
 cd k8s-sonarqube
-echo "Creating Database Password"
-read -p -s "Enter your Database Password (root) : " dbpass
-kubectl create secret generic postgres-pwd --from-literal=password=${dbpass}
+echo "Enter your Database Root Password and press enter:"
+read -s dbpass
+kubectl create secret generic postgres-pwd --from-literal=password=$dbpass
+unset dbpass
 echo "Creating SonarQube with Postgres"
 kubectl create -f sonar-pv-postgres.yaml
 kubectl create -f sonar-pvc-postgres.yaml

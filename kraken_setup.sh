@@ -40,10 +40,14 @@ echo "2. vio-password (Your vio password)"
 echo "3. vio-project-id (Vio Dashboard: Identity >> Projects ** In the table that is displayed, the NAME column is the Tenant Name and the Project ID is just that."
 echo "4. vio-tennant-name (See above)"
 read -n 1 -s -r -p "Press any key to continue..."
-read -p "What is your username? : " name
-read -p -s "What is your password? : " pass
-read -p "What is your project-id? : " pjid
-read -p "What is your tenant-name? : " tenant
+echo "Enter your VIO Username and press enter:"
+read  name
+echo "Enter your VIO Password and press enter:"
+read -s pass
+echo "Enter your ProjectID and press enter:"
+read pjid
+echo "Enter your Tenant Name:"
+read tenant
 sed -i~ -e "s/<<vio-username>>/${name}/g" target_workspace/terraform_desktop.tfvars
 sed -i~ -e "s/<<username>>/${name}/g" target_workspace/terraform_desktop.tfvars
 sed -i~ -e "s/<<vio-password>>/${pass}/g" target_workspace/terraform_desktop.tfvars
@@ -56,7 +60,7 @@ make build
 echo "Creating Terraform Plan"
 docker run --rm kraken --plan --development --username=${name} --local-tf-vars=../target_workspace/terraform_desktop.tfvars
 clear
-echo "Running Terraform Plan - This can take 10+ minutes to run!"
+echo "Running Terraform Apply - This can take 10+ minutes to run!"
 read -n 1 -s -r -p "Press any key to continue..."
 docker run --rm kraken --apply --development --username=${name} --local-tf-vars=../target_workspace/terraform_desktop.tfvars
 mkdir /root/.kube
