@@ -3,6 +3,7 @@
 # Dennis Christilaw (2018)
 # This code is licensed under the GNU General Public License v3.0
 
+clear
 echo "This script will install sonar-scanner environment on your local/dev machine"
 echo "This script requires user input, please keep an eye out for the prompts."
 echo " "

@@ -5,6 +5,7 @@
 # Dennis Christilaw (2018)
 # This code is licensed under the GNU General Public License v3.0
 
+clear
 echo "This script requires user input, please keep an eye out for the prompts."
 read -n 1 -s -r -p "Press any key to continue..."
 echo "Performing Update"
@@ -12,11 +13,11 @@ apt-get -y update
 echo "Clone Kraken Repo"
 git clone git@gitswarm.f5net.com:blue-ca/kraken.git
 echo "Installing Docker"
-sudo apt-get -y install apt-transport-https ca-certificates curl software-properties-common make
+apt-get -y install apt-transport-https ca-certificates curl software-properties-common make
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 apt-get -y update
-apt-get install docker-ce
+apt-get install -y docker-ce
 echo "Installing Kubectl"
 curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
 chmod +x ./kubectl
@@ -30,6 +31,7 @@ update-ca-certificates
 rm -f SE3CI*.crt
 echo "Changing to kraken directory"
 cd kraken
+clear
 echo "The following questions are needed to configure your account info for the build."
 echo "You will need the following from VIO dashboard:"
 echo " "
@@ -53,6 +55,7 @@ echo "Building Kraken"
 make build
 echo "Creating Terraform Plan"
 docker run --rm kraken --plan --development --username=${name} --local-tf-vars=../target_workspace/terraform_desktop.tfvars
+clear
 echo "Running Terraform Plan - This can take 10+ minutes to run!"
 read -n 1 -s -r -p "Press any key to continue..."
 docker run --rm kraken --apply --development --username=${name} --local-tf-vars=../target_workspace/terraform_desktop.tfvars
