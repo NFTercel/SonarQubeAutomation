@@ -34,4 +34,11 @@ read -p "What is the SonarQube URL? (Full url with http://ip_add:port/sonar) >> 
 rm /usr/local/sonar-scanner/conf/sonar-scanner.properties
 printf '%s\n' '#----- Default SonarQube server' 'sonar.host.url='${surl} ' ' '#----- Default source code encoding' '#sonar.sourceEncoding=UTF-8' >/usr/local/sonar-scanner/conf/sonar-scanner.properties
 clear
+cp sonar-project.properties.sample sonar-project.properties
+echo "Enter your Project Key and press enter:"
+read pjkey
+echo "Enter your Project Name and press enter:"
+read pjname
+sed -i~ -e "s/my:project/${pjkey}/g" sonar-project.properties
+sed -i~ -e "s/My_project/${pjname}/g" sonar-project.properties
 echo "###### Local Environment Configuration Completed ####"
