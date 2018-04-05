@@ -18,22 +18,29 @@ read -p "What is the name of your github private ssh key (must be in the ~/.ssh 
 read -p "What is the name of your github user name? : " guser
 (ssh-agent bash -c 'ssh-add ~/.ssh/${gitkey}; git clone git@github.com:${guser}/k8s-sonarqube.git')
 cd k8s-sonarqube
-echo "Enter your Database Root Password and press enter:"
+echo "Enter your Database Root Password and press enter: "
 read -s dbpass
 kubectl create secret generic postgres-pwd --from-literal=password=$dbpass
 unset dbpass
 echo "Creating SonarQube with Postgres"
-kubectl create -f sonar-pv-postgres.yaml
-kubectl create -f sonar-pvc-postgres.yaml
-kubectl create -f sonar-postgres-deployment.yaml
-kubectl create -f sonarqube-deployment.yaml
-kubectl create -f sonarqube-service.yaml
-kubectl create -f sonar-postgres-service.yaml
+kubectl create -f sonar-pv-postgres.yaml -n default
+kubectl create -f sonar-pvc-postgres.yaml -n default
+kubectl create -f sonar-postgres-deployment.yaml -n default
+kubectl create -f sonarqube-deployment.yaml -n default
+kubectl create -f sonarqube-service.yaml -n default
+kubectl create -f sonar-postgres-service.yaml -n default
 cd ..
-echo "Downloading and Installing Sonar Go Plugin on the Server"
+echo "Downloading and Installing Plugins on the Server"
 wget https://github.com/uartois/sonar-golang/releases/download/v1.2.11/sonar-golang-plugin-1.2.11.jar
+wget https://github.com/checkstyle/sonar-checkstyle/releases/download/4.8/checkstyle-sonar-plugin-4.8.jar
+wget https://github.com/SonarQubeCommunity/sonar-build-breaker/releases/download/2.2/sonar-build-breaker-plugin-2.2.jar
+wget https://github.com/QualInsight/qualinsight-plugins-sonarqube-badges/releases/download/qualinsight-plugins-sonarqube-badges-3.0.1/qualinsight-sonarqube-badges-3.0.1.jar
+wget https://sonarsource.bintray.com/Distribution/sonar-javascript-plugin/sonar-javascript-plugin-4.1.0.6085.jar
+wget https://sonarsource.bintray.com/Distribution/sonar-java-plugin/sonar-java-plugin-5.1.1.13214.jar
+wget https://sonarsource.bintray.com/Distribution/sonar-xml-plugin/sonar-xml-plugin-1.4.3.1027.jar
+wget https://github.com/SonarSource/sonar-ldap/releases/download/2.2-RC3/sonar-ldap-plugin-2.2.0.601.jar
 psonar=( $(kubectl get pods -o wide --all-namespaces | grep sonarqube- ) )
-kubectl cp sonar-golang-plugin-1.2.11.jar ${psonar[1]}:/opt/sonarqube/extensions/plugins/
+kubectl cp *.jar ${psonar[1]}:/opt/sonarqube/extensions/plugins/
 echo "Assembling Server URL"
 echo "Here, you will see the IP Addresses for the Pod (external) Sonarqube is deployed too."
 echo "Note the URLS's for all pods if you are not sure which pod is being deployed too."

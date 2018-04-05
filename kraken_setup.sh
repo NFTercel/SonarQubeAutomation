@@ -9,17 +9,18 @@ clear
 echo "This script requires user input, please keep an eye out for the prompts."
 read -n 1 -s -r -p "Press any key to continue..."
 echo "Performing Update"
+uhost=$(cat /etc/hostname ) && \
+echo '127.0.0.1 '$uhost >> /etc/hosts
 apt-get -y update
-echo "Clone Kraken Repo"
+echo "Clone Kraken Repo (from F5 GitLab)"
 git clone git@gitswarm.f5net.com:blue-ca/kraken.git
 echo "Installing Docker"
-apt-get -y install apt-transport-https ca-certificates curl software-properties-common make
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
 add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-apt-get -y update
-apt-get install -y docker-ce
+apt-get update -qy
+apt-get install -qy docker-ce
 echo "Installing Kubectl"
-curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.7.0/bin/linux/amd64/kubectl
 chmod +x ./kubectl
 mv ./kubectl /usr/local/bin/kubectl
 echo "Installing JQ"

@@ -13,14 +13,17 @@ echo "Installing GoLang"
 wget https://dl.google.com/go/go1.10.linux-amd64.tar.gz
 tar -C /usr/local -xzf go1.10.linux-amd64.tar.gz
 mkdir -p /root/go_projects/{bin,src,pkg}
-echo 'PATH=${PATH}:/usr/local/go/bin' >> .bashrc 
-echo 'export GOPATH=$HOME/go_projects' >> .bashrc 
-echo 'export GOBIN=$GOPATH/bin' >> .bashrc && source .bashrc
+echo 'PATH="$PATH:/usr/local/go/bin:/root/go_projects/bin:/usr/local:/usr/local/sonar-scanner/bin:/usr/local/go/bin:/usr/local/sonar-scanner/bin"' >>/root/.profile
+echo 'GOPATH=/root/go_projects'  >>/root/.profile
+echo 'GOBIN=$GOPATH/bin' >>/root/.profile
+source /root/.profile
 echo "Installing GoMetaLinter"
-go get -u gopkg.in/alecthomas/gometalinter.v2
-mv /root/go_projects/bin/gometalinter.v2 /root/go_projects/bin/gometalinter
-sed -i '100s#go/bin#go/bin:/root/go_projects/bin#' .bashrc && source .bashrc
-gometalinter --install
+wget https://github.com/alecthomas/gometalinter/releases/download/v2.0.5/gometalinter-2.0.5-linux-amd64.tar.gz
+tar -C /root/go_projects/bin -xzf gometalinter-2.0.5-linux-amd64.tar.gz
+cd /root/go_projects/bin/gometalinter-2.0.5-linux-amd64
+mv /root/go_projects/bin/gometalinter-2.0.5-linux-amd64/* /root/go_projects/bin/
+/root/go_projects/bin/gometalinter --install
+cd /root
 echo "Installing Code Coverage Tools"
 go get github.com/axw/gocov/...
 go get github.com/AlekSi/gocov-xml
@@ -29,7 +32,6 @@ apt install -y unzip
 wget https://sonarsource.bintray.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-3.0.3.778-linux.zip
 unzip sonar-scanner-cli-3.0.3.778-linux.zip -d /usr/local/
 mv /usr/local/sonar-scanner-3.0.3.778-linux /usr/local/sonar-scanner
-sed -i '100s#go_projects/bin#go_projects/bin:/usr/local/sonar-scanner/bin#' .bashrc && source .bashrc
 read -p "What is the SonarQube URL? (Full url with http://ip_add:port/sonar) >> " surl
 rm /usr/local/sonar-scanner/conf/sonar-scanner.properties
 printf '%s\n' '#----- Default SonarQube server' 'sonar.host.url='${surl} ' ' '#----- Default source code encoding' '#sonar.sourceEncoding=UTF-8' >/usr/local/sonar-scanner/conf/sonar-scanner.properties
